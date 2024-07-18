@@ -145,33 +145,19 @@ static BOOL YTMU(NSString *key) {
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"#EXT-X-MEDIA:URI=\"(https://.*?/index.m3u8)\"" options:0 error:&regexError];
 
     if (!regexError) {        
-        NSTextCheckingResult *match = [regex firstMatchInString:manifestString options:0 range:NSMakeRange(0, [manifestString length])];
         // Search for all matches in the string
-
         NSArray *matches = [regex matchesInString:manifestString options:0 range:NSMakeRange(0, [manifestString length])];
-        if (match && [match numberOfRanges] >= 2) {
 
-            NSString *extractedURL = [manifestString substringWithRange:[match rangeAtIndex:1]];
         if ([matches count] > 0) {
-            [ffmpeg downloadAudio:extractedURL];
             // Last match in the array
-
             NSTextCheckingResult *lastMatch = [matches lastObject];
-            NSMutableArray *thumbnailsArray = playerResponse.playerData.videoDetails.thumbnail.thumbnailsArray;
 
-            YTIThumbnailDetails_Thumbnail *thumbnail = [thumbnailsArray lastObject];
             if (lastMatch && [lastMatch numberOfRanges] >= 2) {
-            NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:thumbnail.URL]];
                 NSString *lastExtractedURL = [manifestString substringWithRange:[lastMatch rangeAtIndex:1]];
-
                 [ffmpeg downloadAudio:lastExtractedURL];
-            if (imageData) {
 
-                NSURL *documentsURL = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
                 NSMutableArray *thumbnailsArray = playerResponse.playerData.videoDetails.thumbnail.thumbnailsArray;
-                NSURL *coverURL = [documentsURL URLByAppendingPathComponent:[NSString stringWithFormat:@"YTMusicUltimate/%@ - %@.png", author, title]];
                 YTIThumbnailDetails_Thumbnail *thumbnail = [thumbnailsArray lastObject];
-                [imageData writeToURL:coverURL atomically:YES];
                 NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:thumbnail.URL]];
 
                 if (imageData) {
