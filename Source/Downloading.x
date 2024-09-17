@@ -144,27 +144,21 @@ static BOOL YTMU(NSString *key) {
     NSError *regexError = nil;
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"#EXT-X-MEDIA:URI=\"(https://.*?/index.m3u8)\"" options:0 error:&regexError];
 
-    if (!regexError) {        
-        // Search for all matches in the string
-        NSArray *matches = [regex matchesInString:manifestString options:0 range:NSMakeRange(0, [manifestString length])];
+    if (!regexError) {
+        NSTextCheckingResult *match = [regex firstMatchInString:manifestString options:0 range:NSMakeRange(0, [manifestString length])];
 
-        if ([matches count] > 0) {
-            // Last match in the array
-            NSTextCheckingResult *lastMatch = [matches lastObject];
+        if (match && [match numberOfRanges] >= 2) {
+            NSString *extractedURL = [manifestString substringWithRange:[match rangeAtIndex:1]];
+            [ffmpeg downloadAudio:extractedURL];
 
-            if (lastMatch && [lastMatch numberOfRanges] >= 2) {
-                NSString *lastExtractedURL = [manifestString substringWithRange:[lastMatch rangeAtIndex:1]];
-                [ffmpeg downloadAudio:lastExtractedURL];
+            NSMutableArray *thumbnailsArray = playerResponse.playerData.videoDetails.thumbnail.thumbnailsArray;
+            YTIThumbnailDetails_Thumbnail *thumbnail = [thumbnailsArray lastObject];
+            NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:thumbnail.URL]];
 
-                NSMutableArray *thumbnailsArray = playerResponse.playerData.videoDetails.thumbnail.thumbnailsArray;
-                YTIThumbnailDetails_Thumbnail *thumbnail = [thumbnailsArray lastObject];
-                NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:thumbnail.URL]];
-
-                if (imageData) {
-                    NSURL *documentsURL = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-                    NSURL *coverURL = [documentsURL URLByAppendingPathComponent:[NSString stringWithFormat:@"YTMusicUltimate/%@ - %@.png", author, title]];
-                    [imageData writeToURL:coverURL atomically:YES];
-                }
+            if (imageData) {
+                NSURL *documentsURL = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+                NSURL *coverURL = [documentsURL URLByAppendingPathComponent:[NSString stringWithFormat:@"YTMusicUltimate/%@ - %@.png", author, title]];
+                [imageData writeToURL:coverURL atomically:YES];
             }
         }
     } else {
