@@ -13,7 +13,7 @@ The best tweak for the YouTube Music on iOS.
 
 ## Download Links
 
-https://github.com/dayanch96/YTLite 4.0.1
+https://github.com/dayanch96/YTLite 5.0.2
 
 https://github.com/thaibm92/YouPiP 1.8.14
 
