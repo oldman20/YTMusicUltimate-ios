@@ -14,7 +14,34 @@ The best tweak for the YouTube Music on iOS.
 ## Different with main repo:
 `Source/FFMpegDownloader.m` & `Source/Downloading.x`
 
-To update fork: compare and edit [Source/Downloading.x](https://github.com/oldman20/YTMusicUltimate-ios/blob/main/Source/Downloading.x) code back to origin then sync, after that can put it back
+To update fork: compare and edit [Source/Downloading.x](https://github.com/oldman20/YTMusicUltimate-ios/blob/main/Source/Downloading.x) code back to origin then sync, after that can put it back if you want
+
+```
+    if (!regexError) {        
+        // Search for all matches in the string
+        NSArray *matches = [regex matchesInString:manifestString options:0 range:NSMakeRange(0, [manifestString length])];
+
+        if ([matches count] > 0) {
+            // Last match in the array
+            NSTextCheckingResult *lastMatch = [matches lastObject];
+
+            if (lastMatch && [lastMatch numberOfRanges] >= 2) {
+                NSString *lastExtractedURL = [manifestString substringWithRange:[lastMatch rangeAtIndex:1]];
+                [ffmpeg downloadAudio:lastExtractedURL];
+
+                NSMutableArray *thumbnailsArray = playerResponse.playerData.videoDetails.thumbnail.thumbnailsArray;
+                YTIThumbnailDetails_Thumbnail *thumbnail = [thumbnailsArray lastObject];
+                NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:thumbnail.URL]];
+
+                if (imageData) {
+                    NSURL *documentsURL = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+                    NSURL *coverURL = [documentsURL URLByAppendingPathComponent:[NSString stringWithFormat:@"YTMusicUltimate/%@ - %@.png", author, title]];
+                    [imageData writeToURL:coverURL atomically:YES];
+                }
+            }
+        }
+    } else {
+	```
 
 ## Download Links
 
