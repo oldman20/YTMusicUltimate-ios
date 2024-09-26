@@ -11,6 +11,11 @@
 The best tweak for the YouTube Music on iOS.
 </p>
 
+## Different with main repo:
+`Source/FFMpegDownloader.m` & `Source/Downloading.x`
+
+To update fork: compare and edit `Source/Downloading.x` code back to origin then sync, after that can put it back
+
 ## Download Links
 
 * **Jailbreak:**
